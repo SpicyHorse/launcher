@@ -9,6 +9,8 @@
 #include <libtorrent/bencode.hpp>
 #include <libtorrent/entry.hpp>
 
+#include <unistd.h>
+
 
 TorrentClient::TorrentClient(QObject *parent) :
     QObject(parent), a(false), s(0)

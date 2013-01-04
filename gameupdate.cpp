@@ -27,7 +27,7 @@ GameUpdate::GameUpdate(QObject *parent) :
     file_config = bi.path() + "/../game_config/game.cfg";
     file_state = bi.path() + "/../game_config/ltrr.state";
     path_gamedir = bi.path() + "/../game_data/";
-#elif WINDOWS
+#elif WIN32 or WINNT
     file_torrent = bi.path() + "/game_config/game.torrent";
     file_config = bi.path() + "/game_config/game.cfg";
     file_state = bi.path() + "/game_config/ltrr.state";

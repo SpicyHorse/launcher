@@ -57,8 +57,8 @@ void MainWindow::startGame()
                      | QFile::ReadGroup | QFile::ReadUser | QFile::ReadOther
                      | QFile::WriteUser );
 
-    gp->start(command, args);
     ui->buttonPlay->setDisabled(true);
+    gp->start(command, args);
 }
 
 void MainWindow::gameProcessStarted()
@@ -71,19 +71,19 @@ void MainWindow::gameProcessError(QProcess::ProcessError)
 {
     show();
     ui->labelReport->setText("FFFFFFailed to start game,\nPlease, report this problem to support");
+    ui->buttonPlay->setDisabled(false);
     QMessageBox::critical(this,
                           "Error starting process",
                           QString("Unable to start game process.\n\nCommand:%1\nArgs:%2\n\nBecause: %3").arg(
                               gu->getGameExecutable(), gu->getGameArgs().join(" "), gp->errorString()));
-    ui->buttonPlay->setDisabled(false);
 }
 
 void MainWindow::gameProcessExited(int r)
 {
     show();
+    ui->buttonPlay->setDisabled(false);
     if (r != 0)
         QMessageBox::critical(this, "Game exit code doesn't looks good", "Game exit code doesn't looks good\nYou can report bug, if you'd like to.");
 
     ui->labelReport->setText("One more time?");
-    ui->buttonPlay->setDisabled(false);
 }
