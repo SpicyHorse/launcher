@@ -13,6 +13,8 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);
+    setStyleSheet("MainWindow {background:transparent;}");
+    setAttribute(Qt::WA_TranslucentBackground);
 
     gu = new GameUpdate(this);
     gp = new QProcess(this);
