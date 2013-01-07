@@ -5,13 +5,14 @@
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QFile>
+#include <QFrame>
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow), gu(0), gp(0)
 {
     ui->setupUi(this);
-    setWindowFlags(Qt::SplashScreen);
+    setWindowFlags(Qt::FramelessWindowHint);
 
     gu = new GameUpdate(this);
     gp = new QProcess(this);

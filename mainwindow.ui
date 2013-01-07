@@ -136,7 +136,7 @@
     </property>
     <property name="icon">
      <iconset resource="assets.qrc">
-      <normaloff>:/images/close_press.png</normaloff>:/images/close_press.png</iconset>
+      <normaloff>:/images/close.png</normaloff>:/images/close.png</iconset>
     </property>
     <property name="iconSize">
      <size>
