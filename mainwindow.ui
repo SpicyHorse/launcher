@@ -31,6 +31,9 @@
   <property name="windowTitle">
    <string>Spicy Launcher</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">MainWindow { background: rgb(255,255,255,0); }</string>
+  </property>
   <widget class="AdWidget" name="centralWidget">
    <widget class="QWidget" name="widgetInformation" native="true">
     <property name="geometry">
@@ -128,7 +131,7 @@
    <widget class="QPushButton" name="buttonClose">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>320</x>
       <y>0</y>
       <width>31</width>
       <height>31</height>
