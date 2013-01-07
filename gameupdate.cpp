@@ -85,12 +85,10 @@ void GameUpdate::run()
     }
 
     try {
-        if (have_update) {
-            emit message("Game update is avaliable, i'll grab one for you");
-            emit showProgress(true);
-            downloadUpdate();
-            emit showProgress(false);
-        }
+        emit showProgress(true);
+        downloadUpdate();
+        emit showProgress(false);
+
         emit message("I'm ready. Press play");
         emit showPlay(true);
     } catch (LaException &e) {

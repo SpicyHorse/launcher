@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/images">
         <file>spicy.png</file>
+        <file>close.png</file>
     </qresource>
 </RCC>

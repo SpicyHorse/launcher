@@ -15,11 +15,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QApplication *app, QWidget *parent = 0);
     ~MainWindow();
 
 protected:
     void closeEvent(QCloseEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void mouseMoveEvent(QMouseEvent *e);
 
 public slots:
     void startGame();
@@ -29,6 +31,8 @@ public slots:
     void gameProcessExited(int);
 
 private:
+    int diffX;
+    int diffY;
     Ui::MainWindow *ui;
     GameUpdate *gu;
     QProcess *gp;

@@ -6,11 +6,13 @@
 #include <QCloseEvent>
 #include <QFile>
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow), gu(0), gp(0)
 {
     ui->setupUi(this);
+    setWindowFlags(Qt::SplashScreen);
+
     gu = new GameUpdate(this);
     gp = new QProcess(this);
 
@@ -25,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(gu, SIGNAL(showPlay(bool)),     ui->buttonPlay,     SLOT(setVisible(bool))  );
 
     connect(ui->buttonPlay, SIGNAL(clicked()), this,            SLOT(startGame())       );
+    connect(ui->buttonClose, SIGNAL(clicked()), app,            SLOT(quit())            );
 
     connect(gp, SIGNAL(started()),          this,               SLOT(gameProcessStarted())   );
     connect(gp, SIGNAL(error(QProcess::ProcessError)), this,    SLOT(gameProcessError(QProcess::ProcessError)) );
@@ -45,6 +48,20 @@ void MainWindow::closeEvent(QCloseEvent *e)
     }
 
     e->accept();
+}
+
+void MainWindow::mousePressEvent(QMouseEvent *e)
+{
+        QPoint p;
+        p = e->pos();
+        diffX = p.x();
+        diffY = p.y();
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent *e)
+{
+    QPoint p = e->globalPos();
+    move(p.x() - diffX, p.y() - diffY);
 }
 
 void MainWindow::startGame()
