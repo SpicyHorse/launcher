@@ -18,7 +18,7 @@
 
 GameUpdate::GameUpdate(QObject *parent) :
     QThread(parent), have_update(false),
-    file_torrent(), file_config(), file_state(), path_gamedir(),
+    file_torrent(), file_config(), file_state(), path_gamedir(), platform(),
     settings(0), tc(0)
 {
     QFileInfo bi(QCoreApplication::applicationFilePath());
@@ -27,11 +27,13 @@ GameUpdate::GameUpdate(QObject *parent) :
     file_config = bi.path() + "/../game_config/game.cfg";
     file_state = bi.path() + "/../game_config/ltrr.state";
     path_gamedir = bi.path() + "/../game_data/";
-#elif WIN32 or WINNT
+    platform = "mac";
+#elif WINNT
     file_torrent = bi.path() + "/game_config/game.torrent";
     file_config = bi.path() + "/game_config/game.cfg";
     file_state = bi.path() + "/game_config/ltrr.state";
     path_gamedir = bi.path() + "/game_data/";
+    platform = "win";
 #endif
 
     if (QFileInfo(file_config).isReadable())
@@ -85,6 +87,7 @@ void GameUpdate::run()
     }
 
     try {
+        emit message("Downloading update");
         emit showProgress(true);
         downloadUpdate();
         emit showProgress(false);
@@ -99,7 +102,7 @@ void GameUpdate::run()
 
 void GameUpdate::checkVersion()
 {
-    QPair<int, QByteArray> response = fetchURL(QUrl(settings->value("global/channel").toString() + "/check/" + calculateMD5(file_torrent)));
+    QPair<int, QByteArray> response = fetchURL(QUrl(settings->value("global/channel").toString() + platform + "/latest/" + calculateMD5(file_torrent)));
 
     if (response.first != 200) {
         qDebug() << "GameUpdate::checkVersion(): !=200" << response.first << response.second;

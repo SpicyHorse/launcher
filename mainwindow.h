@@ -19,7 +19,6 @@ public:
     ~MainWindow();
 
 protected:
-    void closeEvent(QCloseEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void mouseMoveEvent(QMouseEvent *e);
 

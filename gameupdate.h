@@ -30,6 +30,7 @@ private:
     QString file_config;
     QString file_state;
     QString path_gamedir;
+    QString platform;
     QSettings * settings;
     TorrentClient *tc;
 

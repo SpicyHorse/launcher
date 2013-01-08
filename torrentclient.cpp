@@ -85,7 +85,7 @@ void TorrentClient::sync(QString torrent, QString destination_dir) {
         s->get_torrent_status(&tss, &yes);
         for (tss_i = tss.begin(); tss_i != tss.end(); tss_i ++) {
             libtorrent::torrent_status ts = *tss_i;
-            qDebug() << s->is_paused() << s->status().download_rate << ts.error.c_str() << ts.progress;
+            qDebug() << a << s->is_paused() << s->status().download_rate << ts.error.c_str() << ts.progress;
 
             emit progress(100 * ts.progress);
             if (ts.progress == 1)
@@ -99,7 +99,6 @@ void TorrentClient::sync(QString torrent, QString destination_dir) {
 
         std::deque<libtorrent::alert*> alerts;
         s->pop_alerts(&alerts);
-
         for (std::deque<libtorrent::alert*>::iterator i = alerts.begin(), end(alerts.end()); i != end; ++i) {
             libtorrent::alert *al = (*i);
             qDebug() << al->message().c_str();

@@ -41,16 +41,11 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    delete ui;
-}
-
-void MainWindow::closeEvent(QCloseEvent *e)
-{
     if (gu->isRunning()) {
         gu->abort();
     }
 
-    e->accept();
+    delete ui;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *e)
