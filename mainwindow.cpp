@@ -6,6 +6,7 @@
 #include <QCloseEvent>
 #include <QFile>
 #include <QFrame>
+#include <QDebug>
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     QMainWindow(parent),
@@ -98,7 +99,7 @@ void MainWindow::gameProcessExited(int r)
     show();
     ui->buttonPlay->setDisabled(false);
     if (r != 0)
-        QMessageBox::critical(this, "Game exit code doesn't looks good", "Game exit code doesn't looks good\nYou can report bug, if you'd like to.");
+        qWarning() << "MainWindow::gameProcessExited(): Game exit code doesn't looks good. You can report bug, if you'd like to.";
 
     ui->labelReport->setText("One more time?");
 }
