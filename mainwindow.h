@@ -20,6 +20,7 @@ public:
 
 protected:
     void mousePressEvent(QMouseEvent *e);
+    void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *e);
 
 public slots:
@@ -30,9 +31,10 @@ public slots:
     void gameProcessExited(int);
 
 private:
+    Ui::MainWindow *ui;
     int diffX;
     int diffY;
-    Ui::MainWindow *ui;
+    bool diffA;
     GameUpdate *gu;
     QProcess *gp;
 };

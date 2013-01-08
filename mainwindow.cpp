@@ -10,7 +10,8 @@
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow), gu(0), gp(0)
+    ui(new Ui::MainWindow), diffX(), diffY(true), diffA(false), gu(0), gp(0)
+
 {
     ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);
@@ -51,16 +52,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::mousePressEvent(QMouseEvent *e)
 {
-        QPoint p;
-        p = e->pos();
-        diffX = p.x();
-        diffY = p.y();
+    QPoint p;
+    p = e->pos();
+    diffX = p.x();
+    diffY = p.y();
+    diffA = true;
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *)
+{
+    diffA = false;
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent *e)
 {
-    QPoint p = e->globalPos();
-    move(p.x() - diffX, p.y() - diffY);
+    if (diffA) {
+        QPoint p = e->globalPos();
+        move(p.x() - diffX, p.y() - diffY);
+    }
 }
 
 void MainWindow::startGame()

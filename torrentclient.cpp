@@ -27,7 +27,9 @@ void TorrentClient::initSession()
 {
     libtorrent::error_code ec;
     s = new libtorrent::session();
+#if DEBUG_BUILD
     s->set_alert_mask(libtorrent::alert::all_categories);
+#endif
     s->listen_on(std::make_pair(56881, 56889), ec);
 
     if (ec) {
