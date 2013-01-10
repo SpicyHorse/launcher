@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "gameupdate.h"
 
+#include <QSharedMemory>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QFile>
@@ -10,8 +11,7 @@
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow), diffX(), diffY(true), diffA(false), gu(0), gp(0)
-
+    ui(new Ui::MainWindow), shm(new QSharedMemory("SpicyhorseLauncher", this)), diffX(), diffY(true), diffA(false), gu(0), gp(0)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);
@@ -37,12 +37,14 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     connect(gp, SIGNAL(started()),          this,               SLOT(gameProcessStarted())   );
     connect(gp, SIGNAL(error(QProcess::ProcessError)), this,    SLOT(gameProcessError(QProcess::ProcessError)) );
     connect(gp, SIGNAL(finished(int)),      this,               SLOT(gameProcessExited(int))   );
-
-    gu->start();
 }
 
 MainWindow::~MainWindow()
 {
+    if (shm->isAttached()) {
+        shm->detach();
+    }
+
     if (gu->isRunning()) {
         gu->abort();
     }
@@ -69,6 +71,16 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     if (diffA) {
         QPoint p = e->globalPos();
         move(p.x() - diffX, p.y() - diffY);
+    }
+}
+
+void MainWindow::startUpdate()
+{
+    if (!shm->create(1)) {
+        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running, no wai you can has cheesburger.");
+        return;
+    } else {
+        gu->start();
     }
 }
 

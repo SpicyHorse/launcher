@@ -9,6 +9,7 @@ class MainWindow;
 }
 
 class GameUpdate;
+class QSharedMemory;
 
 class MainWindow : public QMainWindow
 {
@@ -24,14 +25,15 @@ protected:
     void mouseMoveEvent(QMouseEvent *e);
 
 public slots:
+    void startUpdate();
     void startGame();
-
     void gameProcessStarted();
     void gameProcessError(QProcess::ProcessError);
     void gameProcessExited(int);
 
 private:
     Ui::MainWindow *ui;
+    QSharedMemory *shm;
     int diffX;
     int diffY;
     bool diffA;
