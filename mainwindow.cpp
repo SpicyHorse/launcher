@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "gameupdate.h"
 
+#include "laexception.h"
 #include <QSharedMemory>
 #include <QMessageBox>
 #include <QCloseEvent>
@@ -11,7 +12,8 @@
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow), shm(new QSharedMemory("SpicyhorseLauncher", this)), diffX(), diffY(true), diffA(false), gu(0), gp(0)
+    ui(new Ui::MainWindow), shm(new QSharedMemory("SpicyhorseLauncher", this)),
+    diffX(), diffY(true), diffA(false), gu(0), gp(0)
 {
     ui->setupUi(this);
     setWindowFlags(Qt::FramelessWindowHint);
@@ -78,7 +80,7 @@ void MainWindow::startUpdate()
 {
     if (!shm->create(1)) {
         QMessageBox::critical(this, "Launcher is already running", "Launcher is already running, no wai you can has cheesburger.");
-        return;
+        exit(EXIT_FAILURE);
     } else {
         gu->start();
     }
