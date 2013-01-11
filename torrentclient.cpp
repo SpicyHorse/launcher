@@ -63,7 +63,7 @@ void TorrentClient::timerEvent(QTimerEvent *)
     s->pop_alerts(&alerts);
     for (std::deque<libtorrent::alert*>::iterator i = alerts.begin(), end(alerts.end()); i != end; ++i) {
         libtorrent::alert *al = (*i);
-        qDebug() << "TorrentClient::timerEvent() libtorrent allerts" << al->message().c_str();
+        qDebug() << "TorrentClient::timerEvent() allert:" << al->message().c_str();
         delete al;
     }
     alerts.clear();
@@ -177,7 +177,7 @@ void TorrentClient::sync(QString torrent, QString destination_dir) {
         if (a || done)
             break;
 
-        usleep(250000);
+        usleep(500000);
     }
 }
 
