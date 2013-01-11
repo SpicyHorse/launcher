@@ -17,11 +17,13 @@ public:
 
     void initSession();
     void closeSession();
+    void timerEvent(QTimerEvent *);
     void sync(QString torrent, QString destination_dir);
 
 private:
     volatile bool a;
     libtorrent::session *s;
+    int timer_id;
 
 signals:
     void progress(int);

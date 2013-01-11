@@ -4,6 +4,8 @@
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
 #ifndef DEBUG_BUILD
     #if MAC_OS_X_VERSION_10_5
     QDir dir(QApplication::applicationDirPath());
@@ -16,7 +18,7 @@ int main(int argc, char *argv[])
     QApplication::setLibraryPaths(QStringList(dir.absolutePath()));
     #endif
 #endif
-    QApplication a(argc, argv);
+
     MainWindow w(&a);
     w.show();
     w.startUpdate();

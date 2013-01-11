@@ -14,7 +14,7 @@
 
 
 TorrentClient::TorrentClient(QObject *parent) :
-    QObject(parent), a(false), s(0)
+    QObject(parent), a(false), s(0), timer_id(-1)
 {
 }
 
@@ -42,16 +42,31 @@ void TorrentClient::initSession()
     s->start_lsd();
     s->start_upnp();
     s->start_natpmp();
+
+    timer_id = startTimer(500);
 }
 
 void TorrentClient::closeSession()
 {
+    killTimer(timer_id);
     s->stop_natpmp();
     s->stop_upnp();
     s->stop_lsd();
     s->stop_dht();
 
     delete s; s=0;
+}
+
+void TorrentClient::timerEvent(QTimerEvent *)
+{
+    std::deque<libtorrent::alert*> alerts;
+    s->pop_alerts(&alerts);
+    for (std::deque<libtorrent::alert*>::iterator i = alerts.begin(), end(alerts.end()); i != end; ++i) {
+        libtorrent::alert *al = (*i);
+        qDebug() << "TorrentClient::timerEvent() libtorrent allerts" << al->message().c_str();
+        delete al;
+    }
+    alerts.clear();
 }
 
 bool yes(libtorrent::torrent_status const&) { return true; }
@@ -111,8 +126,7 @@ void TorrentClient::sync(QString torrent, QString destination_dir) {
                 done = true;
 
             if (!torrent_status.error.empty()) {
-                // todo inform about error;
-                break;
+                qCritical() << "TorrentClient::sync()" << torrent_status.error.c_str();
             }
 
             QString str;
@@ -159,15 +173,6 @@ void TorrentClient::sync(QString torrent, QString destination_dir) {
             if (s->is_paused())
                 s->resume();
         }
-
-        std::deque<libtorrent::alert*> alerts;
-        s->pop_alerts(&alerts);
-        for (std::deque<libtorrent::alert*>::iterator i = alerts.begin(), end(alerts.end()); i != end; ++i) {
-            libtorrent::alert *al = (*i);
-            qDebug() << "TorrentClient::sync()" << al->message().c_str();
-            delete al;
-        }
-        alerts.clear();
 
         if (a || done)
             break;
