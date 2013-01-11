@@ -43,6 +43,7 @@ GameUpdate::GameUpdate(QObject *parent) :
     tc->initSession();
 
     connect(tc, SIGNAL(progress(int)), this, SIGNAL(progress(int)) );
+    connect(tc, SIGNAL(info(QString)), this, SIGNAL(message(QString)) );
 }
 
 GameUpdate::~GameUpdate()

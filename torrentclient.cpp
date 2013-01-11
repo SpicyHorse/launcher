@@ -1,5 +1,6 @@
 #include "torrentclient.h"
 
+#include <QTextStream>
 #include <QFileInfo>
 #include <QDebug>
 
@@ -55,6 +56,20 @@ void TorrentClient::closeSession()
 
 bool yes(libtorrent::torrent_status const&) { return true; }
 
+QString formatSize(int s) {
+    const char *arr[] = { "B", "KB", "MB", "GB", "TB"};
+
+    int t = 0;
+    while (s > 1024 && t < 5) {
+        s = s >> 10;
+        t++;
+    }
+    QString str;
+    QTextStream stream(&str);
+    stream << s << arr[t];
+    return str;
+}
+
 void TorrentClient::sync(QString torrent, QString destination_dir) {
 
     if (!QFileInfo(torrent).isReadable()) {
@@ -86,24 +101,70 @@ void TorrentClient::sync(QString torrent, QString destination_dir) {
 
         s->get_torrent_status(&tss, &yes);
         for (tss_i = tss.begin(); tss_i != tss.end(); tss_i ++) {
-            libtorrent::torrent_status ts = *tss_i;
-            qDebug() << a << s->is_paused() << s->status().download_rate << ts.error.c_str() << ts.progress;
+            libtorrent::torrent_status torrent_status = *tss_i;
+            libtorrent::session_status sessions_status = s->status();
 
-            emit progress(100 * ts.progress);
-            if (ts.progress == 1)
+            qDebug() << "TorrentClient::sync()" << a << s->is_paused()
+                     << sessions_status.download_rate << torrent_status.progress;
+
+            if (torrent_status.progress == 1)
                 done = true;
 
-            if (!ts.error.empty()) {
+            if (!torrent_status.error.empty()) {
                 // todo inform about error;
                 break;
             }
+
+            QString str;
+            QTextStream stream(&str);
+            stream << "Syncing game: ";
+
+            switch (torrent_status.state) {
+            case libtorrent::torrent_status::queued_for_checking:
+                stream << "queued";
+                break;
+            case libtorrent::torrent_status::checking_files:
+                stream << "checking local files";
+                break;
+            case libtorrent::torrent_status::downloading_metadata:
+                stream << "fetching meta";
+                break;
+            case libtorrent::torrent_status::downloading:
+                stream << "downloading";
+                break;
+            case libtorrent::torrent_status::finished:
+                stream << "finished";
+                break;
+            case libtorrent::torrent_status::seeding:
+                stream << "seeding";
+                break;
+            case libtorrent::torrent_status::allocating:
+                stream << "allocating";
+                break;
+            case libtorrent::torrent_status::checking_resume_data:
+                stream << "checking resume";
+                break;
+            default:
+                stream << "ololo";
+                break;
+            }
+            stream << "\n";
+
+            stream << "got: "<< formatSize(torrent_status.total_wanted_done) <<" from: " << formatSize(torrent_status.total_wanted)
+                   << " speed: "<< formatSize(sessions_status.download_rate);
+
+            emit progress(100 * torrent_status.progress);
+            emit info(str);
+
+            if (s->is_paused())
+                s->resume();
         }
 
         std::deque<libtorrent::alert*> alerts;
         s->pop_alerts(&alerts);
         for (std::deque<libtorrent::alert*>::iterator i = alerts.begin(), end(alerts.end()); i != end; ++i) {
             libtorrent::alert *al = (*i);
-            qDebug() << al->message().c_str();
+            qDebug() << "TorrentClient::sync()" << al->message().c_str();
             delete al;
         }
         alerts.clear();

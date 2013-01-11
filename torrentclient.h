@@ -25,6 +25,7 @@ private:
 
 signals:
     void progress(int);
+    void info(QString);
 
 public slots:
     void abort();
