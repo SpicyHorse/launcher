@@ -15,13 +15,15 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     adwidget.cpp \
     gameupdate.cpp \
-    torrentclient.cpp
+    torrentclient.cpp \
+    platform.cpp
 
 HEADERS  += mainwindow.h \
     adwidget.h \
     gameupdate.h \
     torrentclient.h \
-    laexception.h
+    laexception.h \
+    platform.h
 
 FORMS    += mainwindow.ui
 
