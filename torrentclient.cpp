@@ -63,7 +63,7 @@ void TorrentClient::timerEvent(QTimerEvent *)
     s->pop_alerts(&alerts);
     for (std::deque<libtorrent::alert*>::iterator i = alerts.begin(), end(alerts.end()); i != end; ++i) {
         libtorrent::alert *al = (*i);
-        qDebug() << "TorrentClient::timerEvent() allert:" << al->message().c_str();
+        qDebug() << "TorrentClient::timerEvent() alert:" << al->message().c_str();
         delete al;
     }
     alerts.clear();
@@ -72,7 +72,7 @@ void TorrentClient::timerEvent(QTimerEvent *)
 bool yes(libtorrent::torrent_status const&) { return true; }
 
 QString formatSize(int s) {
-    const char *arr[] = { "B", "KB", "MB", "GB", "TB"};
+    static const char *arr[] = { "B", "KiB", "MiB", "GiB", "TiB"};
 
     int t = 0;
     while (s > 1024 && t < 5) {
@@ -164,8 +164,8 @@ void TorrentClient::sync(QString torrent, QString destination_dir) {
             }
             stream << "\n";
 
-            stream << "got: "<< formatSize(torrent_status.total_wanted_done) <<" from: " << formatSize(torrent_status.total_wanted)
-                   << " speed: "<< formatSize(sessions_status.download_rate);
+            stream << "got: "<< formatSize(torrent_status.total_wanted_done) <<" of: " << formatSize(torrent_status.total_wanted)
+                   << " speed: "<< formatSize(sessions_status.download_rate) << "/s";
 
             emit progress(100 * torrent_status.progress);
             emit info(str);
