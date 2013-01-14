@@ -93,7 +93,7 @@ void GameUpdate::run()
         downloadUpdate();
         emit showProgress(false);
 
-        emit message("I'm ready. Press play");
+        emit message("I'm Ready. Press Play!");
         emit showPlay(true);
     } catch (LaException &e) {
         emit message("Error while checking game updates");
