@@ -124,5 +124,5 @@ void MainWindow::gameProcessExited(int r)
     if (r != 0)
         qWarning() << "MainWindow::gameProcessExited(): Game exit code doesn't looks good. You can report bug, if you'd like to.";
 
-    ui->labelReport->setText("One more time?");
+    ui->labelReport->setText("The Demons are Growing in Strength!");
 }
