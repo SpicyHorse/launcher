@@ -1,11 +1,13 @@
 #include <QApplication>
 #include <QDir>
 #include "mainwindow.h"
+#include "platform.h"
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    platformInitialize();
 
+    QApplication a(argc, argv);
 #ifndef DEBUG_BUILD
     #if MAC_OS_X_VERSION_10_5
     QDir dir(QApplication::applicationDirPath());
