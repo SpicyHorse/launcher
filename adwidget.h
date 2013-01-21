@@ -2,6 +2,8 @@
 #define ADWIDGET_H
 
 #include <QWidget>
+#include <QList>
+
 class QImage;
 
 class AdWidget : public QWidget
@@ -10,13 +12,21 @@ class AdWidget : public QWidget
 public:
     explicit AdWidget(QWidget *parent = 0);
 
-    void setImage(QImage *);
+    void setAdvertisment(QStringList);
+    void setFrame(QString);
+    void setAdvertismentOffset(int, int);
 
 protected:
+    void timerEvent(QTimerEvent *);
     void paintEvent(QPaintEvent *);
 
 private:
-    QImage *background_image;
+    QImage *back_image;
+    QImage *frame_image;
+    QList<QImage *> ads_images;
+    int ads_index;
+    int ads_fx;
+    int ads_fy;
 
 signals:
     

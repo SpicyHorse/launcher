@@ -12,25 +12,30 @@ class TorrentClient : public QObject
 {
     Q_OBJECT
 public:
-    explicit TorrentClient(QObject *parent = 0);
-    ~TorrentClient();
-
-    void initSession();
-    void closeSession();
-    void timerEvent(QTimerEvent *);
-    void sync(QString torrent, QString destination_dir);
-
-private:
-    volatile bool a;
-    libtorrent::session *s;
-    int timer_id;
-
-signals:
-    void progress(int);
-    void info(QString);
+    explicit TorrentClient(QObject *parent);
+    virtual ~TorrentClient();
 
 public slots:
-    void abort();
+    bool openSession();
+    void closeSession();
+    void applySettings();
+    bool openTorrent(QString torrent, QString destination_dir);
+
+protected:
+    void timerEvent(QTimerEvent *);
+    void timerLog();
+    void timerSync();
+
+private:
+    libtorrent::session *session;
+    int log_timer_id;
+    int sync_timer_id;
+
+signals:
+    void message(QString);
+    void progress(int);
+    void success(bool);
+    void error();
 };
 
 #endif // TORRENTCLIENT_H

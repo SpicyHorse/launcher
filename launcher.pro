@@ -14,18 +14,24 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     adwidget.cpp \
-    gameupdate.cpp \
     torrentclient.cpp \
-    platform.cpp
+    platform.cpp \
+    updateserver.cpp \
+    settingsdialog.cpp \
+    utils.cpp \
+    progresswidget.cpp
 
 HEADERS  += mainwindow.h \
     adwidget.h \
-    gameupdate.h \
     torrentclient.h \
-    laexception.h \
-    platform.h
+    platform.h \
+    updateserver.h \
+    settingsdialog.h \
+    utils.h \
+    progresswidget.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    settingsdialog.ui
 
 RESOURCES += \
     assets.qrc

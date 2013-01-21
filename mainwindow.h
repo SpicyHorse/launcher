@@ -5,11 +5,14 @@
 #include <QProcess>
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
-class GameUpdate;
 class QSharedMemory;
+class QSettings;
+class UpdateServer;
+class TorrentClient;
+class SettingsDialog;
 
 class MainWindow : public QMainWindow
 {
@@ -17,7 +20,7 @@ class MainWindow : public QMainWindow
     
 public:
     explicit MainWindow(QApplication *app, QWidget *parent = 0);
-    ~MainWindow();
+    virtual ~MainWindow();
 
 protected:
     void mousePressEvent(QMouseEvent *e);
@@ -26,19 +29,35 @@ protected:
 
 public slots:
     void startUpdate();
-    void startGame();
+
+    void updateServerSuccess(bool);
+    void updateServerError();
+
+    void torrentClientSuccess(bool);
+    void torrentClientError();
+
+    void gameProcessStart();
     void gameProcessStarted();
     void gameProcessError(QProcess::ProcessError);
     void gameProcessExited(int);
 
+private slots:
+    void initUI();
+
 private:
     Ui::MainWindow *ui;
+    SettingsDialog *sd;
     QSharedMemory *shm;
     int diffX;
     int diffY;
     bool diffA;
-    GameUpdate *gu;
+
+    QSettings *app_settings;
+    QSettings *game_settings;
+
     QProcess *gp;
+    UpdateServer *us;
+    TorrentClient *tc;
 };
 
 #endif // MAINWINDOW_H
