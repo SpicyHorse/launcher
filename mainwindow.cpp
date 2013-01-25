@@ -25,7 +25,11 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     gp(0), us(0), tc(0)
 {
     if (!shm->create(1)) {
-        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running, no wai you can has cheesburger.");
+#ifdef MAC_OS_X_VERSION_10_5
+        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running, if it is not so then restart your mac");
+#else
+        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running, close it first.");
+#endif
         exit(EXIT_FAILURE);
     }
 
@@ -193,7 +197,7 @@ void MainWindow::gameProcessStarted()
 void MainWindow::gameProcessError(QProcess::ProcessError)
 {
     show();
-    ui->reportLabel->setText("FFFFFFailed to start game,\nPlease, report this problem to support");
+    ui->reportLabel->setText("Failed to start game,\nPlease, report this problem to support");
     ui->playButton->setDisabled(false);
     QMessageBox::critical(this,
                           "Error starting process",
