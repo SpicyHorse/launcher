@@ -26,7 +26,7 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 {
     if (!shm->create(1)) {
 #ifdef MAC_OS_X_VERSION_10_5
-        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running. If it is not please restart your mac");
+        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running. If it is not please restart your mac.");
 #else
         QMessageBox::critical(this, "Launcher is already running", "Launcher is already running.");
 #endif
