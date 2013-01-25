@@ -7,6 +7,7 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
+    connect(ui->debugLinkButton, SIGNAL(clicked()), this, SIGNAL(debugRequested()) );
 }
 
 SettingsDialog::~SettingsDialog()
@@ -19,8 +20,12 @@ void SettingsDialog::show()
     QSettings s;
 
     ui->seedCheckBox->setChecked(s.value("bt/seed_enabled", true).toBool());
+
     ui->downloadCheckBox->setChecked(s.value("bt/download_limit_enabled", false).toBool());
     ui->uploadCheckBox->setChecked(s.value("bt/upload_limit_enabled", false).toBool());
+
+    ui->downloadSpin->setEnabled(s.value("bt/download_limit_enabled", false).toBool());
+    ui->uploadSpin->setEnabled(s.value("bt/upload_limit_enabled", false).toBool());
     ui->downloadSpin->setValue(s.value("bt/download_limit_value", 128).toInt());
     ui->uploadSpin->setValue(s.value("bt/upload_limit_value", 128).toInt());
 

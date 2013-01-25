@@ -1,10 +1,12 @@
 #include "torrentclient.h"
 
+#include <QNetworkInterface>
 #include <QTimerEvent>
 #include <QTextStream>
 #include <QSettings>
 #include <QFileInfo>
 #include <QDebug>
+
 
 #include <libtorrent/session.hpp>
 #include <libtorrent/bencode.hpp>
@@ -89,6 +91,12 @@ void TorrentClient::applySettings()
     }
 
     session->set_settings(settings);
+
+    if (!s.value("bt/seed_enabled", true).toBool()) {
+        pauseSeeding();
+    } else {
+        resumeSeeding();
+    }
 }
 
 bool TorrentClient::openTorrent(QString torrent, QString destination_dir) {
@@ -211,7 +219,10 @@ void TorrentClient::timerSync()
         if (session->is_paused())
             session->resume();
 
-        if (torrent_status.progress == 1) {
+        if (torrent_status.is_finished) {
+            QSettings s;
+            if (!s.value("bt/seed_enabled", true).toBool())
+                pauseSeeding();
 
             killTimer(sync_timer_id); sync_timer_id = -1;
             emit message(tr("Game Syncronized"));
@@ -222,4 +233,76 @@ void TorrentClient::timerSync()
             qCritical() << "TorrentClient::timerSync() error" << torrent_status.error.c_str();
         }
     }
+}
+
+void TorrentClient::pauseSeeding()
+{
+    std::vector<libtorrent::torrent_handle> ts =  session->get_torrents();
+    std::vector<libtorrent::torrent_handle>::iterator ti;
+    for (ti = ts.begin(); ti < ts.end(); ti++) {
+        libtorrent::torrent_handle t_handle = (*ti);
+        libtorrent::torrent_status t_status = t_handle.status();
+        if (t_status.is_finished && t_status.is_seeding) {
+            t_handle.auto_managed(false);
+            t_handle.pause(libtorrent::torrent_handle::graceful_pause);
+        }
+    }
+}
+
+void TorrentClient::resumeSeeding()
+{
+    std::vector<libtorrent::torrent_handle> ts =  session->get_torrents();
+    std::vector<libtorrent::torrent_handle>::iterator ti;
+    for (ti = ts.begin(); ti < ts.end(); ti++) {
+        libtorrent::torrent_handle t_handle = (*ti);
+        libtorrent::torrent_status t_status = t_handle.status();
+        if (t_status.paused) {
+            t_handle.auto_managed(true);
+            t_handle.resume();
+        }
+    }
+}
+
+QString TorrentClient::getDebug()
+{
+    QString ret;
+    QTextStream s(&ret);
+
+    s << "Host:\n";
+    s << "===========================\n";
+
+    QList<QHostAddress> ni = QNetworkInterface::allAddresses();
+    for(int i=0; i<ni.count(); i++) {
+        s << "Interface: " << ni[i].toString() << "\n";
+    }
+    s << "\n";
+    libtorrent::session_status session_status = session->status();
+    s << "Session:\n";
+    s << "===========================\n";
+    s << "uTP Connections: " << session_status.utp_stats.num_connected << "\n";
+    s << "DWQ: " << session_status.disk_write_queue << "\n";
+    s << "RWQ: " << session_status.disk_read_queue << "\n";
+    s << "\n";
+    s << "Payloads:\n";
+    s << "===========================\n";
+    std::vector<libtorrent::torrent_handle> ts =  session->get_torrents();
+    std::vector<libtorrent::torrent_handle>::iterator ti;
+    for (ti = ts.begin(); ti < ts.end(); ti++) {
+        libtorrent::torrent_handle t_handle = (*ti);
+        libtorrent::torrent_status t_status = t_handle.status();
+        libtorrent::torrent_info t_info = t_handle.get_torrent_info();
+
+        s << t_info.name().c_str() << "\n";
+        s << "---------------------------\n";
+        s << "Size:" << t_info.total_size() << "\n";
+        s << "State:" << t_status.state << "\n";
+        s << "DL rate:" << t_status.download_rate << "\n";
+        s << "UL rate:" << t_status.upload_rate << "\n";
+        s << "Seeds:" << t_status.num_seeds << "\n";
+        s << "Peers:" << t_status.num_peers << "\n";
+        s << "Progress:" << t_status.progress << "\n";
+        s << "Error:" << t_status.error.c_str() << "\n";
+    }
+
+    return ret;
 }

@@ -19,6 +19,9 @@ public slots:
     void show();
     void accept();
 
+signals:
+    void debugRequested();
+
 private:
     Ui::SettingsDialog *ui;
 };

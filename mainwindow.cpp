@@ -74,6 +74,7 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     connect( tc, SIGNAL(success(bool)), this, SLOT(torrentClientSuccess(bool)) );
     connect( tc, SIGNAL(error()), this, SLOT(torrentClientError()) );
     connect( this->sd, SIGNAL(accepted()), this->tc, SLOT(applySettings()) );
+    connect( this->sd, SIGNAL(debugRequested()), this, SLOT(showDebugInfo()) );
 
     QTimer::singleShot(0, this, SLOT(startUpdate()));
 }
@@ -284,3 +285,7 @@ void MainWindow::initUI()
     ui->reportLabel->setStyleSheet(game_settings->value("gui/main_window_progress_text_style").toString());
 }
 
+void MainWindow::showDebugInfo()
+{
+    QMessageBox::information(this, "Debug Info", tc->getDebug());
+}

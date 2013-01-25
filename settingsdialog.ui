@@ -9,9 +9,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>318</height>
+    <width>450</width>
+    <height>350</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Launcher Settings</string>
@@ -44,9 +50,6 @@
         <property name="maximum">
          <number>1000000</number>
         </property>
-        <property name="value">
-         <number>128</number>
-        </property>
        </widget>
       </item>
       <item row="2" column="2">
@@ -77,9 +80,6 @@
         <property name="maximum">
          <number>1000000</number>
         </property>
-        <property name="value">
-         <number>128</number>
-        </property>
        </widget>
       </item>
       <item row="6" column="2">
@@ -95,17 +95,28 @@
         </property>
        </spacer>
       </item>
-      <item row="0" column="2">
-       <widget class="QCheckBox" name="seedCheckBox">
-        <property name="text">
-         <string>seed</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="1">
        <widget class="QLabel" name="generalLabel">
         <property name="text">
          <string>General:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2" colspan="2">
+       <widget class="QCheckBox" name="seedCheckBox">
+        <property name="text">
+         <string>seed game to other players</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1" colspan="3">
+       <widget class="QCommandLinkButton" name="debugLinkButton">
+        <property name="text">
+         <string>Generate Debug data for support Team</string>
+        </property>
+        <property name="icon">
+         <iconset resource="assets.qrc">
+          <normaloff>:/images/attention.png</normaloff>:/images/attention.png</iconset>
         </property>
        </widget>
       </item>
@@ -115,7 +126,7 @@
    <item>
     <widget class="QLabel" name="supportLabel">
      <property name="text">
-      <string>Problem officer? Email us at &lt;a href=&quot;mailto:contact@spicyhorse.com&quot;&gt;contact@spicyhorse.com&lt;/a&gt;&lt;br&gt;Or visit our forums at: &lt;a href=&quot;http://spicyworld.spicyhorse.com&quot;&gt;spicyworld.spicyhorse.com&lt;/a&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Problems or Questions? Email us at &lt;a href=&quot;mailto:contact@spicyhorse.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;contact@spicyhorse.com&lt;/span&gt;&lt;/a&gt;&lt;br/&gt;Or visit our forums at: &lt;a href=&quot;http://spicyworld.spicyhorse.com&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;spicyworld.spicyhorse.com&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -137,7 +148,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

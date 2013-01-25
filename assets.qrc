@@ -4,5 +4,6 @@
         <file>close.png</file>
         <file>play.png</file>
         <file>settings.png</file>
+        <file>attention.png</file>
     </qresource>
 </RCC>

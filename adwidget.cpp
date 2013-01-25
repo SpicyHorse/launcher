@@ -18,7 +18,12 @@ void AdWidget::setAdvertisment(QStringList img_list)
     qDebug() << "AdWidget::setAdvertisment" << img_list;
 
     for (int i = 0; i < img_list.size(); ++i) {
-        ads_images.append(new QImage(getAsset(img_list.at(i))));
+        QImage *img = new QImage();
+        if (!img->load(getAsset(img_list.at(i)))) {
+            qCritical() << "AdWidget::setAdvertisment error loading image" << i;
+        }
+
+        ads_images.append(img);
     }
 
     timerEvent(0);

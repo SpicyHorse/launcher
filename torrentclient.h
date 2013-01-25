@@ -20,6 +20,9 @@ public slots:
     void closeSession();
     void applySettings();
     bool openTorrent(QString torrent, QString destination_dir);
+    void pauseSeeding();
+    void resumeSeeding();
+    QString getDebug();
 
 protected:
     void timerEvent(QTimerEvent *);

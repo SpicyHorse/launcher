@@ -24,7 +24,9 @@ QString UpdateServer::calculateMD5(QString file)
     QCryptographicHash h(QCryptographicHash::Md5);
 
     f.open(QIODevice::ReadOnly);
-    h.addData(f.readAll()); // TODO: i can eat memory too
+    while (!f.atEnd()) {
+        h.addData(f.read(4096));
+    }
 
     return h.result().toHex();
 }

@@ -41,6 +41,8 @@ public slots:
     void gameProcessError(QProcess::ProcessError);
     void gameProcessExited(int);
 
+    void showDebugInfo();
+
 private slots:
     void initUI();
 
