@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>450</width>
-    <height>350</height>
+    <height>352</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -122,9 +122,6 @@
       </item>
       <item row="3" column="3">
        <widget class="QSpinBox" name="connectionsSpin">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
         <property name="minimum">
          <number>8</number>
         </property>
