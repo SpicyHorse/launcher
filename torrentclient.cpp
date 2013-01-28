@@ -75,7 +75,6 @@ void TorrentClient::applySettings()
 
     settings.user_agent = "SpicyhorseLauncher/0010";
     settings.stop_tracker_timeout = 1;
-    settings.connections_limit = 128;
     settings.file_pool_size = 32;
 
     if (s.value("bt/upload_limit_enabled", false).toBool()) {
@@ -89,6 +88,8 @@ void TorrentClient::applySettings()
     } else {
         settings.download_rate_limit = 0;
     }
+
+    settings.connections_limit = s.value("bt/connections_limit_value", 32).toInt();
 
     session->set_settings(settings);
 

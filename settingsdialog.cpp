@@ -28,6 +28,7 @@ void SettingsDialog::show()
     ui->uploadSpin->setEnabled(s.value("bt/upload_limit_enabled", false).toBool());
     ui->downloadSpin->setValue(s.value("bt/download_limit_value", 128).toInt());
     ui->uploadSpin->setValue(s.value("bt/upload_limit_value", 128).toInt());
+    ui->connectionsSpin->setValue(s.value("bt/connections_limit_value", 32).toInt());
 
     QDialog::show();
 }
@@ -41,6 +42,7 @@ void SettingsDialog::accept()
     s.setValue("bt/upload_limit_enabled", ui->uploadCheckBox->isChecked());
     s.setValue("bt/download_limit_value", ui->downloadSpin->value());
     s.setValue("bt/upload_limit_value", ui->uploadSpin->value());
+    s.setValue("bt/connections_limit_value", ui->connectionsSpin->value());
 
     QDialog::accept();
 }

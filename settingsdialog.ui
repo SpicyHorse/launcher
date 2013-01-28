@@ -82,7 +82,7 @@
         </property>
        </widget>
       </item>
-      <item row="6" column="2">
+      <item row="5" column="2">
        <spacer name="verticalSpacer">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -109,7 +109,7 @@
         </property>
        </widget>
       </item>
-      <item row="7" column="1" colspan="3">
+      <item row="6" column="1" colspan="3">
        <widget class="QCommandLinkButton" name="debugLinkButton">
         <property name="text">
          <string>Generate Debug data for support Team</string>
@@ -117,6 +117,29 @@
         <property name="icon">
          <iconset resource="assets.qrc">
           <normaloff>:/images/attention.png</normaloff>:/images/attention.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QSpinBox" name="connectionsSpin">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="minimum">
+         <number>8</number>
+        </property>
+        <property name="maximum">
+         <number>256</number>
+        </property>
+        <property name="value">
+         <number>32</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLabel" name="bandwithLabel_2">
+        <property name="text">
+         <string>max connections</string>
         </property>
        </widget>
       </item>
