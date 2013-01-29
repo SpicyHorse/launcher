@@ -258,8 +258,8 @@ void MainWindow::initUI()
     ui->playButton->setGeometry(
                 game_settings->value("gui/main_window_play_x").toInt(),
                 game_settings->value("gui/main_window_play_y").toInt(),
-                game_settings->value("gui/main_window_play_h").toInt(),
-                game_settings->value("gui/main_window_play_w").toInt()
+                game_settings->value("gui/main_window_play_w").toInt(),
+                game_settings->value("gui/main_window_play_h").toInt()
                 );
     ui->playButton->setIcon(QIcon(getAsset(game_settings->value("gui/main_window_play_on").toString())));
     ui->playButton->setIconSize(QSize(game_settings->value("gui/main_window_play_w").toInt(), game_settings->value("gui/main_window_play_h").toInt()));
