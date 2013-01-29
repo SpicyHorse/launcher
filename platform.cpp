@@ -12,7 +12,7 @@
 #ifdef Q_WS_MAC
 #include <sys/resource.h>
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#elif Q_WS_WIN
+#elif defined Q_WS_WIN
 #include <stdio.h>
 #endif
 
@@ -77,7 +77,7 @@ void platformInitialize()
     qDebug() << "Platform initialization: open files limit" << rlp.rlim_cur << "rising to max" << min(OPEN_MAX, rlp.rlim_max);
     rlp.rlim_cur = min(OPEN_MAX, rlp.rlim_max);
     setrlimit(RLIMIT_NOFILE, &rlp);
-#elif Q_WS_WIN
+#elif defined Q_WS_WIN
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cd("plugins");
     QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
