@@ -45,7 +45,7 @@ QString getGameTorrentStateFile()
 
 QString getGameDataDirectory()
 {
-    return *launcher_data_path() + "/" + game_settings->value("global/name").toString();
+    return *launcher_data_path() + "/" + game_settings->value("global/name").toString() + "/";
 }
 
 QString getAsset(QString asset)
