@@ -3,12 +3,16 @@
 
 #include <QString>
 
+class QSettings;
+
 // get common paths
+QString getPlatformId();
 QString getGameConfigFile();
 QString getGameTorrentFile();
 QString getGameTorrentStateFile();
 QString getGameDataDirectory();
-QString getPlatformId();
+
+QSettings * getGameSettings();
 
 // get path to asset
 QString getAsset(QString);

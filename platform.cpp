@@ -1,24 +1,32 @@
 #include "platform.h"
 
+#include <QDesktopServices>
 #include <QCoreApplication>
+#include <QSettings>
+#include <QMessageBox>
 #include <QFileInfo>
 #include <QDir>
 
 #include <QDebug>
 
-#if MAC_OS_X_VERSION_10_5
+#ifdef Q_WS_MAC
 #include <sys/resource.h>
 #define min(a,b) (((a) < (b)) ? (a) : (b))
-#elif WINNT
+#elif Q_WS_WIN
 #include <stdio.h>
 #endif
 
+Q_GLOBAL_STATIC(QString, platform_id)
 Q_GLOBAL_STATIC(QString, game_config_dir)
 Q_GLOBAL_STATIC(QString, game_config_file)
-Q_GLOBAL_STATIC(QString, game_torrent_file)
-Q_GLOBAL_STATIC(QString, game_torrent_state_file)
-Q_GLOBAL_STATIC(QString, game_data_directory)
-Q_GLOBAL_STATIC(QString, platform_id)
+Q_GLOBAL_STATIC(QString, launcher_data_path)
+
+static QSettings * game_settings;
+
+QString getPlatformId()
+{
+    return *platform_id();
+}
 
 QString getGameConfigFile()
 {
@@ -27,22 +35,17 @@ QString getGameConfigFile()
 
 QString getGameTorrentFile()
 {
-    return *game_torrent_file();
+    return *launcher_data_path() + "/" + game_settings->value("global/name").toString() + ".torrent";
 }
 
 QString getGameTorrentStateFile()
 {
-    return *game_torrent_state_file();
+    return *launcher_data_path() + "/" + game_settings->value("global/name").toString() + ".state";
 }
 
 QString getGameDataDirectory()
 {
-    return *game_data_directory();
-}
-
-QString getPlatformId()
-{
-    return *platform_id();
+    return *launcher_data_path() + "/" + game_settings->value("global/name").toString();
 }
 
 QString getAsset(QString asset)
@@ -50,11 +53,16 @@ QString getAsset(QString asset)
     return *game_config_dir() + asset;
 }
 
+QSettings * getGameSettings()
+{
+    return game_settings;
+}
+
 void platformInitialize()
 {
     QFileInfo executable_file_info(QCoreApplication::applicationFilePath());
 
-#if MAC_OS_X_VERSION_10_5
+#ifdef Q_WS_MAC
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cdUp();
     dir.cd("plugins");
@@ -62,9 +70,6 @@ void platformInitialize()
 
     *game_config_dir()          = executable_file_info.path() + "/../game_config/";
     *game_config_file()         = executable_file_info.path() + "/../game_config/game.cfg";
-    *game_torrent_file()        = executable_file_info.path() + "/../game_config/game.torrent";
-    *game_torrent_state_file()  = executable_file_info.path() + "/../game_config/game.state";
-    *game_data_directory()      = executable_file_info.path() + "/../game_data/";
     *platform_id()              = "mac";
 
     rlimit rlp;
@@ -72,19 +77,30 @@ void platformInitialize()
     qDebug() << "Platform initialization: open files limit" << rlp.rlim_cur << "rising to max" << min(OPEN_MAX, rlp.rlim_max);
     rlp.rlim_cur = min(OPEN_MAX, rlp.rlim_max);
     setrlimit(RLIMIT_NOFILE, &rlp);
-#elif WINNT
+#elif Q_WS_WIN
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cd("plugins");
     QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
 
     *game_config_dir()          = executable_file_info.path() + "/game_config/";
-    *game_config_file()         = executable_file_info.path() + "/game_config/game.torrent";
-    *game_torrent_file()        = executable_file_info.path() + "/game_config/game.cfg";
-    *game_torrent_state_file()  = executable_file_info.path() + "/game_config/ltrr.state";
-    *game_data_directory()      = executable_file_info.path() + "/game_data/";
+    *game_config_file()         = executable_file_info.path() + "/game_config/game.cfg";
     *platform_id()              = "win";
 
     qDebug() << "Platform initialization: open files limit" << _getmaxstdio() << "rising to max" << 2048;
     _setmaxstdio(2048);
 #endif
+
+    *launcher_data_path() = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
+    if (!QFileInfo(getGameConfigFile()).isReadable()) {
+        qCritical() << "MainWindow::MainWindow() unable to open configuration" << getGameConfigFile();
+        QMessageBox::critical(0, "Unable to open game configuration", "Unable to open game configuration.");
+        exit(EXIT_FAILURE);
+    }
+
+    game_settings = new QSettings(*game_config_file(), QSettings::IniFormat);
+
+    if (!QFileInfo(*launcher_data_path()).exists()) {
+        QDir().mkpath(*launcher_data_path());
+    }
 }

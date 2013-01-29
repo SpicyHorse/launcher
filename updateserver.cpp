@@ -12,8 +12,8 @@
 
 #include "platform.h"
 
-UpdateServer::UpdateServer(QObject *parent, QSettings *cfg) :
-    QObject(parent), game_cfg(cfg), net_manager(new QNetworkAccessManager(this))
+UpdateServer::UpdateServer(QObject *parent) :
+    QObject(parent), game_cfg(getGameSettings()), net_manager(new QNetworkAccessManager(this))
 {
     connect(net_manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(requestFinished(QNetworkReply*)));
 }
@@ -42,6 +42,7 @@ void UpdateServer::checkUpdates()
 
     net_manager->get(request);
     qDebug() << "UpdateServer::checkUpdates() request started" << url;
+    qDebug() << ">>>>>" << getGameTorrentFile();
 }
 
 void UpdateServer::requestFinished(QNetworkReply *reply)

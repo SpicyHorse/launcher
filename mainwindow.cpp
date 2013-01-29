@@ -25,7 +25,7 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     gp(0), us(0), tc(0)
 {
     if (!shm->create(1)) {
-#ifdef MAC_OS_X_VERSION_10_5
+#ifdef Q_WS_MAC
         QMessageBox::critical(this, "Launcher is already running", "Launcher is already running. If it is not please restart your mac.");
 #else
         QMessageBox::critical(this, "Launcher is already running", "Launcher is already running.");
@@ -50,19 +50,13 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     connect( gp, SIGNAL(error(QProcess::ProcessError)), this, SLOT(gameProcessError(QProcess::ProcessError)) );
     connect( gp, SIGNAL(finished(int)), this, SLOT(gameProcessExited(int)) );
 
-    if (!QFileInfo(getGameConfigFile()).isReadable()) {
-        qCritical() << "MainWindow::MainWindow() unable to open configuration" << getGameConfigFile();
-        ui->reportLabel->setText(tr("Unable to open game configuration"));
-        return;
-    }
-
     app_settings = new QSettings();
-    game_settings = new QSettings(getGameConfigFile(), QSettings::IniFormat);
+    game_settings = getGameSettings();
     if (game_settings->childGroups().contains("gui")) {
         initUI();
     }
 
-    us = new UpdateServer(this, game_settings);
+    us = new UpdateServer(this);
     connect( us, SIGNAL(message(QString)), ui->reportLabel, SLOT(setText(QString)) );
     connect( us, SIGNAL(success(bool)), this, SLOT(updateServerSuccess(bool)) );
     connect( us, SIGNAL(error()), this, SLOT(updateServerError()) );

@@ -4,18 +4,18 @@
 #include <QObject>
 #include <QString>
 
-class QSettings;
 class QNetworkAccessManager;
 class QNetworkReply;
+class QSettings;
 
 class UpdateServer : public QObject
 {
     Q_OBJECT
 public:
-    explicit UpdateServer(QObject *parent, QSettings *cfg);
+    explicit UpdateServer(QObject *parent);
 
 private:
-    QSettings *game_cfg;
+    QSettings * game_cfg;
     QNetworkAccessManager *net_manager;
 
     QString calculateMD5(QString file);
