@@ -7,6 +7,8 @@
 #include <QCryptographicHash>
 #include <QFile>
 
+#include <QDesktopServices>
+#include <QMessageBox>
 #include <QSettings>
 #include <QDebug>
 
@@ -38,7 +40,7 @@ void UpdateServer::checkUpdates()
     QString url(game_cfg->value("global/channel").toString() + getPlatformId() + "/latest/" + calculateMD5(getGameTorrentFile()));
     QNetworkRequest request;
     request.setUrl(QUrl(url));
-    request.setRawHeader("User-Agent", "SpicyLauncher");
+    request.setRawHeader("User-Agent", "SpicyLauncher/0");
 
     net_manager->get(request);
     qDebug() << "UpdateServer::checkUpdates() request started" << url;
@@ -60,6 +62,15 @@ void UpdateServer::requestFinished(QNetworkReply *reply)
     if (http_data.startsWith("FRESH")) {
         emit message(tr("No updates avaliable"));
         emit success(false);
+    } else if (http_data.startsWith("LAUNCHER:")) {
+        int b = QMessageBox::warning(
+                    0, "Launcher need to be updated",
+                    "Launcher need to be updated, this version is too old.\nOpen update page?",
+                    QMessageBox::Ok, QMessageBox::Cancel
+                    );
+        if (b == QMessageBox::Ok)
+            QDesktopServices::openUrl(QUrl(http_data.mid(9)));
+        emit message(tr("Update launcher and try again!"));
     } else if (http_data.startsWith("UPDATE:")) {
         emit message(tr("Applying update to game BT-info"));
 
