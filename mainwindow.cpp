@@ -179,6 +179,7 @@ void MainWindow::gameProcessStart()
                      | QFile::WriteUser );
 
     ui->playButton->setDisabled(true);
+    gp->setWorkingDirectory(getGameDataDirectory() + getPlatformId());
     gp->start(command, args);
 }
 
