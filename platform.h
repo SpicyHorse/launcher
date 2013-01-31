@@ -7,7 +7,6 @@ class QSettings;
 
 // get common paths
 QString getPlatformId();
-QString getGameConfigFile();
 QString getGameTorrentFile();
 QString getGameTorrentStateFile();
 QString getGameDataDirectory();

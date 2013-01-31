@@ -28,11 +28,6 @@ QString getPlatformId()
     return *platform_id();
 }
 
-QString getGameConfigFile()
-{
-    return *game_config_file();
-}
-
 QString getGameTorrentFile()
 {
     return *launcher_data_path() + "/" + game_settings->value("global/name").toString() + ".torrent";
@@ -92,8 +87,8 @@ void platformInitialize()
 
     *launcher_data_path() = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
 
-    if (!QFileInfo(getGameConfigFile()).isReadable()) {
-        qCritical() << "MainWindow::MainWindow() unable to open configuration" << getGameConfigFile();
+    if (!QFileInfo(*game_config_file()).isReadable()) {
+        qCritical() << "MainWindow::MainWindow() unable to open configuration" << *game_config_file();
         QMessageBox::critical(0, "Unable to open game configuration", "Unable to open game configuration.");
         exit(EXIT_FAILURE);
     }
