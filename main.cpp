@@ -5,10 +5,10 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    platformInitialize();
     a.setOrganizationName("SpicyHorse");
     a.setOrganizationDomain("spicyhorse.com");
     a.setApplicationName("Launcher");
+    platformInitialize();
 
     MainWindow w(&a);
     w.show();
