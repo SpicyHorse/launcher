@@ -18,9 +18,11 @@ public:
 public slots:
     void show();
     void accept();
+    void selectPath();
 
 signals:
     void debugRequested();
+    void moveGameDataRequested(QString, QString);
 
 private:
     Ui::SettingsDialog *ui;

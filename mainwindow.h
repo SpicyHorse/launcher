@@ -13,11 +13,12 @@ class QSettings;
 class UpdateServer;
 class TorrentClient;
 class SettingsDialog;
+class QProgressDialog;
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    
+
 public:
     explicit MainWindow(QApplication *app, QWidget *parent = 0);
     virtual ~MainWindow();
@@ -26,6 +27,7 @@ protected:
     void mousePressEvent(QMouseEvent *e);
     void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *e);
+    void closeEvent(QCloseEvent *);
 
 public slots:
     void startUpdate();
@@ -42,9 +44,11 @@ public slots:
     void gameProcessExited(int);
 
     void showDebugInfo();
+    void moveGameData(QString, QString);
 
 private slots:
     void initUI();
+    QString getGameFolder();
 
 private:
     Ui::MainWindow *ui;

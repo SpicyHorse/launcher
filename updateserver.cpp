@@ -40,7 +40,7 @@ void UpdateServer::checkUpdates()
     QString url(game_cfg->value("global/channel").toString() + getPlatformId() + "/latest/" + calculateMD5(getGameTorrentFile()));
     QNetworkRequest request;
     request.setUrl(QUrl(url));
-    request.setRawHeader("User-Agent", "SpicyLauncher/0");
+    request.setRawHeader("User-Agent", LAUNCHER_VERSION);
 
     net_manager->get(request);
     qDebug() << "UpdateServer::checkUpdates() request started" << url;

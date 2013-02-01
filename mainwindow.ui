@@ -123,6 +123,11 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>playButton</tabstop>
+  <tabstop>settingsButton</tabstop>
+  <tabstop>closeButton</tabstop>
+ </tabstops>
  <resources>
   <include location="assets.qrc"/>
  </resources>

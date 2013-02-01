@@ -23,6 +23,11 @@ Q_GLOBAL_STATIC(QString, launcher_data_path)
 
 static QSettings * game_settings;
 
+QString getGameName()
+{
+    return game_settings->value("global/name").toString();
+}
+
 QString getPlatformId()
 {
     return *platform_id();
@@ -30,17 +35,17 @@ QString getPlatformId()
 
 QString getGameTorrentFile()
 {
-    return *launcher_data_path() + "/" + game_settings->value("global/name").toString() + ".torrent";
+    return *launcher_data_path() + "/game.torrent";
 }
 
 QString getGameTorrentStateFile()
 {
-    return *launcher_data_path() + "/" + game_settings->value("global/name").toString() + ".state";
+    return *launcher_data_path() + "/game.state";
 }
 
-QString getGameDataDirectory()
+QString getDefaultGameDataDirectory()
 {
-    return *launcher_data_path() + "/" + game_settings->value("global/name").toString() + "/";
+    return *launcher_data_path() + "/game_data/";
 }
 
 QString getAsset(QString asset)
@@ -85,17 +90,28 @@ void platformInitialize()
     _setmaxstdio(2048);
 #endif
 
-    *launcher_data_path() = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-
     if (!QFileInfo(*game_config_file()).isReadable()) {
         qCritical() << "MainWindow::MainWindow() unable to open configuration" << *game_config_file();
         QMessageBox::critical(0, "Unable to open game configuration", "Unable to open game configuration.");
         exit(EXIT_FAILURE);
     }
-
     game_settings = new QSettings(*game_config_file(), QSettings::IniFormat);
+
+    QCoreApplication::setOrganizationName("SpicyHorse");
+    QCoreApplication::setOrganizationDomain("spicyhorse.com");
+    QCoreApplication::setApplicationName(getGameName());
+
+    *launcher_data_path() = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    // Migration one
+    QDir m1_dir(*launcher_data_path());
+    m1_dir.cdUp();
+    if (m1_dir.cd("Launcher")) {
+        QDir().rename(m1_dir.absolutePath(), *launcher_data_path());
+    }
 
     if (!QFileInfo(*launcher_data_path()).exists()) {
         QDir().mkpath(*launcher_data_path());
     }
+
+
 }

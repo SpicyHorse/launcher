@@ -14,6 +14,7 @@
 
 #include <unistd.h>
 
+#include "platform.h"
 #include "utils.h"
 
 TorrentClient::TorrentClient(QObject *parent) :
@@ -64,6 +65,13 @@ void TorrentClient::closeSession()
     session->stop_lsd();
     session->stop_dht();
 
+    if (sync_timer_id) {
+        killTimer(sync_timer_id); sync_timer_id = -1;
+    }
+
+    if (log_timer_id >0) {
+        killTimer(log_timer_id); log_timer_id = -1;
+    }
     delete session; session=0;
 }
 
@@ -73,9 +81,12 @@ void TorrentClient::applySettings()
 
     libtorrent::session_settings settings = session->settings();
 
-    settings.user_agent = "SpicyhorseLauncher/0010";
+    settings.always_send_user_agent = true;
+    settings.user_agent = LAUNCHER_VERSION;
     settings.stop_tracker_timeout = 1;
     settings.file_pool_size = 32;
+    settings.enable_incoming_utp = s.value("bt/utp_enabled", true).toBool();
+    settings.enable_outgoing_utp = s.value("bt/utp_enabled", true).toBool();
 
     if (s.value("bt/upload_limit_enabled", false).toBool()) {
         settings.upload_rate_limit = s.value("bt/upload_limit_value", 128).toInt() * 1024;

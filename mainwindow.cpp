@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QProgressDialog>
 #include <QDesktopWidget>
 #include <QSharedMemory>
 #include <QMessageBox>
@@ -9,6 +10,7 @@
 #include <QTimer>
 #include <QFileInfo>
 #include <QFile>
+#include <QDir>
 
 #include <QDebug>
 
@@ -72,7 +74,9 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     connect( tc, SIGNAL(success(bool)), this, SLOT(torrentClientSuccess(bool)) );
     connect( tc, SIGNAL(error()), this, SLOT(torrentClientError()) );
     connect( this->sd, SIGNAL(accepted()), this->tc, SLOT(applySettings()) );
+
     connect( this->sd, SIGNAL(debugRequested()), this, SLOT(showDebugInfo()) );
+    connect( this->sd, SIGNAL(moveGameDataRequested(QString,QString)), this, SLOT(moveGameData(QString,QString)) );
 
     QTimer::singleShot(0, this, SLOT(startUpdate()));
 }
@@ -82,6 +86,8 @@ MainWindow::~MainWindow()
     if (shm->isAttached()) {
         shm->detach();
     }
+
+    app_settings->sync();
 
     delete ui;
 }
@@ -111,6 +117,11 @@ void MainWindow::mouseMoveEvent(QMouseEvent *e)
     }
 }
 
+void MainWindow::closeEvent(QCloseEvent *) {
+    app_settings->setValue("MainWindowX", x());
+    app_settings->setValue("MainWindowY", y());
+}
+
 /*
  * Game Process section
  */
@@ -126,7 +137,7 @@ void MainWindow::startUpdate()
 
 void MainWindow::updateServerSuccess(bool)
 {
-    tc->openTorrent(getGameTorrentFile(), getGameDataDirectory());
+    tc->openTorrent(getGameTorrentFile(), getGameFolder());
 }
 
 void MainWindow::updateServerError()
@@ -170,7 +181,7 @@ void MainWindow::torrentClientError()
 
 void MainWindow::gameProcessStart()
 {
-    QString command = getGameDataDirectory() + game_settings->value("global/executable").toString();
+    QString command = getDefaultGameDataDirectory() + game_settings->value("global/executable").toString();
     QStringList args = game_settings->value("global/args").toStringList();
 
     QFile f(command);
@@ -179,7 +190,7 @@ void MainWindow::gameProcessStart()
                      | QFile::WriteUser );
 
     ui->playButton->setDisabled(true);
-    gp->setWorkingDirectory(getGameDataDirectory() + getPlatformId());
+    gp->setWorkingDirectory(getDefaultGameDataDirectory() + getPlatformId());
     gp->start(command, args);
 }
 
@@ -197,7 +208,7 @@ void MainWindow::gameProcessError(QProcess::ProcessError)
     QMessageBox::critical(this,
                           "Error starting process",
                           QString("Unable to start game process.\n\nCommand:%1\nArgs:%2\n\nBecause: %3").arg(
-                              getGameDataDirectory() + game_settings->value("global/executable").toString(),
+                              getDefaultGameDataDirectory() + game_settings->value("global/executable").toString(),
                               game_settings->value("global/args").toStringList().join(" "),
                               gp->errorString())
                           );
@@ -223,8 +234,8 @@ void MainWindow::initUI()
     QRect desk_geom = QApplication::desktop()->geometry();
     resize(mws);
     setGeometry(
-                desk_geom.width()/2-width()/2,
-                desk_geom.height()/2-height()/2,
+                app_settings->value("MainWindowX", desk_geom.width()/2-width()/2).toInt(),
+                app_settings->value("MainWindowY", desk_geom.height()/2-height()/2).toInt(),
                 game_settings->value("gui/main_window_w").toInt(),
                 game_settings->value("gui/main_window_h").toInt()
                 );
@@ -287,4 +298,47 @@ void MainWindow::initUI()
 void MainWindow::showDebugInfo()
 {
     QMessageBox::information(this, "Debug Info", tc->getDebug());
+}
+
+void MainWindow::moveGameData(QString from, QString to)
+{
+    QProgressDialog * progress = new QProgressDialog("Copying files...", "Abort Copy", 0, 4, this);
+    progress->setWindowModality(Qt::ApplicationModal);
+    progress->show();
+
+    qDebug() << "MainWindow::moveGameData() moving game" << from << to;
+
+    progress->setLabelText(tr("Moving game data: stopping bt-client session"));
+    tc->closeSession();
+    progress->setValue(1);
+
+    progress->setLabelText(tr("Moving game data: relocating game files"));
+    if (QFileInfo(from).exists()) {
+        if (!QDir().rmdir(to)) {
+            qCritical() << "MainWindow::moveGameData() failed to remove destination" << from << to;
+            QMessageBox::critical(
+                        this,
+                        tr("Destination directory is not empty or writeable"),
+                        tr("Destination directory is not empty or writeable. Can not prepare it for data relocation.")
+            );
+            app_settings->setValue("bt/datapath", from);
+        }
+        QDir().rename(from, to);
+    }
+    progress->setValue(2);
+
+    progress->setLabelText(tr("Moving game data: starting bt-client session"));
+    tc->openSession();
+    progress->setValue(3);
+
+    progress->setLabelText(tr("Moving game data: resuming game syncronization"));
+    tc->openTorrent(getGameTorrentFile(), getGameFolder());
+    progress->setValue(4);
+
+    progress->setLabelText(tr("Moving game data: done"));
+}
+
+QString MainWindow::getGameFolder()
+{
+    return app_settings->value("bt/datapath", getDefaultGameDataDirectory()).toString();
 }

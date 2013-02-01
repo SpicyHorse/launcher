@@ -5,11 +5,14 @@
 
 class QSettings;
 
+#define LAUNCHER_VERSION "SpicyLauncher/1"
+
 // get common paths
+QString getGameName();
 QString getPlatformId();
 QString getGameTorrentFile();
 QString getGameTorrentStateFile();
-QString getGameDataDirectory();
+QString getDefaultGameDataDirectory();
 
 QSettings * getGameSettings();
 
