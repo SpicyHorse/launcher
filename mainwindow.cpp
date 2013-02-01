@@ -340,5 +340,5 @@ void MainWindow::moveGameData(QString from, QString to)
 
 QString MainWindow::getGameFolder()
 {
-    return app_settings->value("bt/datapath", getDefaultGameDataDirectory()).toString() + "/";
+    return app_settings->value("bt/datapath", getDefaultGameDataDirectory()).toString() + QDir::separator();
 }
