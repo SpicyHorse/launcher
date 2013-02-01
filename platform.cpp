@@ -107,11 +107,17 @@ void platformInitialize()
     m1_dir.cdUp();
     if (m1_dir.cd("Launcher")) {
         QDir().rename(m1_dir.absolutePath(), *launcher_data_path());
+        QDir().rename(
+                    *launcher_data_path() + "/akaneiro/",
+                    *launcher_data_path() + "/game_data/"
+                    );
+        QFile().rename(
+                    *launcher_data_path() + "/akaneiro.torrent",
+                    *launcher_data_path() + "/game.torrent"
+                    );
     }
 
     if (!QFileInfo(*launcher_data_path()).exists()) {
         QDir().mkpath(*launcher_data_path());
     }
-
-
 }
