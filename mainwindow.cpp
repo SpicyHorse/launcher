@@ -181,7 +181,7 @@ void MainWindow::torrentClientError()
 
 void MainWindow::gameProcessStart()
 {
-    QString command = getDefaultGameDataDirectory() + game_settings->value("global/executable").toString();
+    QString command = getGameFolder() + game_settings->value("global/executable").toString();
     QStringList args = game_settings->value("global/args").toStringList();
 
     QFile f(command);
