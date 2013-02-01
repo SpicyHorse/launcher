@@ -190,7 +190,7 @@ void MainWindow::gameProcessStart()
                      | QFile::WriteUser );
 
     ui->playButton->setDisabled(true);
-    gp->setWorkingDirectory(getDefaultGameDataDirectory() + getPlatformId());
+    gp->setWorkingDirectory(getGameFolder() + getPlatformId());
     gp->start(command, args);
 }
 
@@ -208,7 +208,7 @@ void MainWindow::gameProcessError(QProcess::ProcessError)
     QMessageBox::critical(this,
                           "Error starting process",
                           QString("Unable to start game process.\n\nCommand:%1\nArgs:%2\n\nBecause: %3").arg(
-                              getDefaultGameDataDirectory() + game_settings->value("global/executable").toString(),
+                              getGameFolder() + game_settings->value("global/executable").toString(),
                               game_settings->value("global/args").toStringList().join(" "),
                               gp->errorString())
                           );
@@ -340,5 +340,5 @@ void MainWindow::moveGameData(QString from, QString to)
 
 QString MainWindow::getGameFolder()
 {
-    return app_settings->value("bt/datapath", getDefaultGameDataDirectory()).toString();
+    return app_settings->value("bt/datapath", getDefaultGameDataDirectory()).toString() + "/";
 }
