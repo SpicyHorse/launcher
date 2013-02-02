@@ -101,7 +101,7 @@ void platformInitialize()
     QCoreApplication::setOrganizationDomain("spicyhorse.com");
     QCoreApplication::setApplicationName(getGameName());
 
-    *launcher_data_path() = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    *launcher_data_path() = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
     // Migration one
     QDir m1_dir(*launcher_data_path());
     m1_dir.cdUp();

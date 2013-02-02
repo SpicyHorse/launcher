@@ -27,7 +27,7 @@ void SettingsDialog::show()
     QSettings s;
 
     ui->seedCheckBox->setChecked(s.value("bt/seed_enabled", true).toBool());
-    ui->dataPathEdit->setText(s.value("bt/datapath", getDefaultGameDataDirectory()).toString());
+    ui->dataPathEdit->setText(QDir::toNativeSeparators(s.value("bt/datapath", getDefaultGameDataDirectory()).toString()));
 
     ui->downloadCheckBox->setChecked(s.value("bt/download_limit_enabled", false).toBool());
     ui->uploadCheckBox->setChecked(s.value("bt/upload_limit_enabled", false).toBool());
@@ -50,7 +50,7 @@ void SettingsDialog::accept()
     s.setValue("bt/seed_enabled", ui->seedCheckBox->isChecked());
 
     QDir src_dir(s.value("bt/datapath", getDefaultGameDataDirectory()).toString());
-    QDir dst_dir(ui->dataPathEdit->text());
+    QDir dst_dir(QDir::fromNativeSeparators(ui->dataPathEdit->text()));
     if (src_dir != dst_dir) {
         s.setValue("bt/datapath", ui->dataPathEdit->text());
         emit moveGameDataRequested(src_dir.absolutePath(), dst_dir.absolutePath());
