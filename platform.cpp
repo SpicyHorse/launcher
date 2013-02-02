@@ -35,17 +35,17 @@ QString getPlatformId()
 
 QString getGameTorrentFile()
 {
-    return *launcher_data_path() + QDir::separator() + "game.torrent";
+    return *launcher_data_path() + "/game.torrent";
 }
 
 QString getGameTorrentStateFile()
 {
-    return *launcher_data_path() + QDir::separator() + "game.state";
+    return *launcher_data_path() + "/game.state";
 }
 
 QString getDefaultGameDataDirectory()
 {
-    return *launcher_data_path() + QDir::separator() + "game_data" + QDir::separator();
+    return *launcher_data_path() + "/game_data/";
 }
 
 QString getAsset(QString asset)
@@ -82,8 +82,8 @@ void platformInitialize()
     dir.cd("plugins");
     QCoreApplication::setLibraryPaths(QStringList(dir.absolutePath()));
 
-    *game_config_dir()          = executable_file_info.path() + QDir::separator() + "game_config" + QDir::separator();
-    *game_config_file()         = executable_file_info.path() + QDir::separator() + "game_config" + QDir::separator() + "game.cfg";
+    *game_config_dir()          = executable_file_info.path() + "/game_config/";
+    *game_config_file()         = executable_file_info.path() + "/game_config/game.cfg";
     *platform_id()              = "win";
 
     qDebug() << "Platform initialization: open files limit" << _getmaxstdio() << "rising to max" << 2048;
@@ -102,18 +102,18 @@ void platformInitialize()
     QCoreApplication::setApplicationName(getGameName());
 
     *launcher_data_path() = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    // Migration 0 -> 1
+    // Migration one
     QDir m1_dir(*launcher_data_path());
     m1_dir.cdUp();
     if (m1_dir.cd("Launcher")) {
         QDir().rename(m1_dir.absolutePath(), *launcher_data_path());
         QDir().rename(
-                    *launcher_data_path() + QDir::separator() + "akaneiro" + QDir::separator(),
-                    *launcher_data_path() + QDir::separator() + "game_data" + QDir::separator()
+                    *launcher_data_path() + "/akaneiro/",
+                    *launcher_data_path() + "/game_data/"
                     );
         QFile().rename(
-                    *launcher_data_path() + QDir::separator() + "akaneiro.torrent",
-                    *launcher_data_path() + QDir::separator() + "game.torrent"
+                    *launcher_data_path() + "/akaneiro.torrent",
+                    *launcher_data_path() + "/game.torrent"
                     );
     }
 
