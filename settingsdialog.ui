@@ -350,5 +350,37 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>downloadCheckBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>downloadSpin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>281</x>
+     <y>56</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>56</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>uploadCheckBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>uploadSpin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>281</x>
+     <y>91</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
