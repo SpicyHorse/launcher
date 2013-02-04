@@ -45,7 +45,7 @@ QString getGameTorrentStateFile()
 
 QString getDefaultGameDataDirectory()
 {
-    return *launcher_data_path() + "/game_data/";
+    return *launcher_data_path() + "/game_data";
 }
 
 QString getAsset(QString asset)
@@ -122,7 +122,7 @@ void platformInitialize()
         }
 
         if (app_settings.contains("bt/datapath")) {
-            app_settings.setValue("bt/datapath", QDir::fromNativeSeparators(app_settings.value("bt/datapath").toString()));
+            app_settings.remove("bt/datapath");
         }
     }
 
