@@ -102,8 +102,10 @@ void platformInitialize()
     QCoreApplication::setApplicationName(getGameName());
 
     *launcher_data_path() = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
+
+    QSettings app_settings;
     // Migration one
-    if (!game_settings->contains("version")) {
+    if (!app_settings.contains("version")) {
         QDir m1_dir(*launcher_data_path());
         m1_dir.cdUp();
 
@@ -119,14 +121,14 @@ void platformInitialize()
                         );
         }
 
-        if (game_settings->contains("bt/datapath")) {
-            game_settings->setValue("bt/datapath", QDir::fromNativeSeparators(game_settings->value("bt/datapath").toString()));
+        if (app_settings.contains("bt/datapath")) {
+            app_settings.setValue("bt/datapath", QDir::fromNativeSeparators(app_settings.value("bt/datapath").toString()));
         }
     }
 
     // done with migrations, tag current version
-    game_settings->setValue("version", LAUNCHER_VERSION_INT);
-    game_settings->sync();
+    app_settings.setValue("version", LAUNCHER_VERSION_INT);
+    app_settings.sync();
 
     if (!QFileInfo(*launcher_data_path()).exists()) {
         QDir().mkpath(*launcher_data_path());
