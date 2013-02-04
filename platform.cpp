@@ -103,19 +103,30 @@ void platformInitialize()
 
     *launcher_data_path() = QDir::fromNativeSeparators(QDesktopServices::storageLocation(QDesktopServices::DataLocation));
     // Migration one
-    QDir m1_dir(*launcher_data_path());
-    m1_dir.cdUp();
-    if (m1_dir.cd("Launcher")) {
-        QDir().rename(m1_dir.absolutePath(), *launcher_data_path());
-        QDir().rename(
-                    *launcher_data_path() + "/akaneiro/",
-                    *launcher_data_path() + "/game_data/"
-                    );
-        QFile().rename(
-                    *launcher_data_path() + "/akaneiro.torrent",
-                    *launcher_data_path() + "/game.torrent"
-                    );
+    if (!game_settings->contains("version")) {
+        QDir m1_dir(*launcher_data_path());
+        m1_dir.cdUp();
+
+        if (m1_dir.cd("Launcher")) {
+            QDir().rename(m1_dir.absolutePath(), *launcher_data_path());
+            QDir().rename(
+                        *launcher_data_path() + "/akaneiro/",
+                        *launcher_data_path() + "/game_data/"
+                        );
+            QFile().rename(
+                        *launcher_data_path() + "/akaneiro.torrent",
+                        *launcher_data_path() + "/game.torrent"
+                        );
+        }
+
+        if (game_settings->contains("bt/datapath")) {
+            game_settings->setValue("bt/datapath", QDir::fromNativeSeparators(game_settings->value("bt/datapath").toString()));
+        }
     }
+
+    // done with migrations, tag current version
+    game_settings->setValue("version", LAUNCHER_VERSION_INT);
+    game_settings->sync();
 
     if (!QFileInfo(*launcher_data_path()).exists()) {
         QDir().mkpath(*launcher_data_path());
