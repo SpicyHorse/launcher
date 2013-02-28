@@ -163,7 +163,7 @@ void MainWindow::updateServerError()
 
 void MainWindow::torrentClientSuccess(bool)
 {
-    ui->reportLabel->setText("I'm ready, Press play!");
+    ui->reportLabel->setText("Ready, Press Play button to begin!");
     ui->playButton->setDisabled(false);
 }
 
