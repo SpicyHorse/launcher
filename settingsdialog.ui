@@ -49,7 +49,7 @@
    <item row="2" column="0">
     <widget class="QLabel" name="dataPathLabel_2">
      <property name="text">
-      <string>v0.2.5</string>
+      <string>v0.2.6</string>
      </property>
     </widget>
    </item>

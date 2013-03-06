@@ -5,8 +5,8 @@
 
 class QSettings;
 
-#define LAUNCHER_VERSION "SpicyLauncher/1"
-#define LAUNCHER_VERSION_INT 1
+#define LAUNCHER_VERSION "SpicyLauncher/2"
+#define LAUNCHER_VERSION_INT 2
 
 // get common paths
 QString getGameName();

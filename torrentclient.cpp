@@ -129,14 +129,14 @@ bool TorrentClient::openTorrent(QString torrent, QString destination_dir) {
     libtorrent::add_torrent_params p;
 
     libtorrent::torrent_info *ti;
-    ti = new libtorrent::torrent_info(torrent.toLocal8Bit().data(), ec);
+    ti = new libtorrent::torrent_info(torrent.toUtf8().constData(), ec);
     if (ec) {
         qCritical() << "Unable to get torrent info. TRR error:" << ec.message().c_str();
         emit message(tr("Unable to get torrent info"));
         return false;
     }
 
-    p.save_path = destination_dir.toLocal8Bit().data();
+    p.save_path = destination_dir.toUtf8().constData();
     p.ti = ti;
     session->add_torrent(p, ec);
     if (ec) {
