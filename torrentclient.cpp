@@ -34,17 +34,24 @@ bool TorrentClient::openSession()
 
     applySettings();
 
-#if DEBUG_BUILD
+#ifdef DEBUG_BUILD
     session->set_alert_mask(libtorrent::alert::all_categories);
 #endif
-    session->listen_on(std::make_pair(56881, 56889), ec);
 
+#if LIBTORRENT_VERSION_MINOR < 16
+    if (!session->listen_on(std::make_pair(56881, 56889))) {
+        qCritical() << this << "listen_on returned error";
+        emit message(tr("Unable to start listening"));
+        return false;
+    }
+#else
+    session->listen_on(std::make_pair(56881, 56889), ec);
     if (ec) {
         qCritical() << this << ec.message().c_str();
         emit message(tr("Unable to start listening"));
         return false;
     }
-
+#endif
     session->start_dht();
     session->start_lsd();
     session->start_upnp();
@@ -81,10 +88,14 @@ void TorrentClient::applySettings()
 
     libtorrent::session_settings settings = session->settings();
 
-    settings.always_send_user_agent = true;
     settings.user_agent = LAUNCHER_VERSION;
     settings.stop_tracker_timeout = 1;
     settings.file_pool_size = 32;
+#if LIBTORRENT_VERSION_MINOR < 16
+    // TODO
+    settings.active_limit = s.value("bt/connections_limit_value", 32).toInt();
+#else
+    settings.always_send_user_agent = true;
     settings.enable_incoming_utp = s.value("bt/utp_enabled", true).toBool();
     settings.enable_outgoing_utp = s.value("bt/utp_enabled", true).toBool();
 
@@ -101,7 +112,7 @@ void TorrentClient::applySettings()
     }
 
     settings.connections_limit = s.value("bt/connections_limit_value", 32).toInt();
-
+#endif
     session->set_settings(settings);
 
     if (!s.value("bt/seed_enabled", true).toBool()) {
@@ -164,28 +175,43 @@ void TorrentClient::timerEvent(QTimerEvent *event)
 
 void TorrentClient::timerLog()
 {
+
+#if LIBTORRENT_VERSION_MINOR < 16
+    // TODO
+#else
     std::deque<libtorrent::alert*> alerts;
     session->pop_alerts(&alerts);
+
     for (std::deque<libtorrent::alert*>::iterator i = alerts.begin(), end(alerts.end()); i != end; ++i) {
         libtorrent::alert *al = (*i);
         qDebug() << "TorrentClient::timerLog():" << al->message().c_str();
         delete al;
     }
     alerts.clear();
+#endif
 }
 
 void TorrentClient::timerSync()
 {
+#if LIBTORRENT_VERSION_MINOR < 16
+    std::vector<libtorrent::torrent_handle> torrents = session->get_torrents();
+    std::vector<libtorrent::torrent_handle>::iterator torrents_iterator;
+
+    for (torrents_iterator = torrents.begin(); torrents_iterator != torrents.end(); torrents_iterator ++) {
+        libtorrent::torrent_handle torrent_handle = *torrents_iterator;
+        libtorrent::torrent_status torrent_status = torrent_handle.status();
+#else
     std::vector<libtorrent::torrent_status> tss;
     std::vector<libtorrent::torrent_status>::iterator tss_i;
 
     session->get_torrent_status(&tss, &yes);
     for (tss_i = tss.begin(); tss_i != tss.end(); tss_i ++) {
         libtorrent::torrent_status torrent_status = *tss_i;
+#endif
         libtorrent::session_status sessions_status = session->status();
 
         qDebug() << "TorrentClient::timerSync()" << session->is_paused()
-                 << sessions_status.download_rate << torrent_status.progress;
+                 << sessions_status.download_rate << torrent_status.progress << torrent_status.state;
 
         QString str;
         QTextStream stream(&str);
@@ -231,7 +257,13 @@ void TorrentClient::timerSync()
         if (session->is_paused())
             session->resume();
 
+#if LIBTORRENT_VERSION_MINOR < 16
+        if (torrent_status.state==libtorrent::torrent_status::finished
+                || torrent_status.state==libtorrent::torrent_status::seeding) {
+#else
+
         if (torrent_status.is_finished) {
+#endif
             QSettings s;
             if (!s.value("bt/seed_enabled", true).toBool())
                 pauseSeeding();
@@ -254,10 +286,18 @@ void TorrentClient::pauseSeeding()
     for (ti = ts.begin(); ti < ts.end(); ti++) {
         libtorrent::torrent_handle t_handle = (*ti);
         libtorrent::torrent_status t_status = t_handle.status();
+#if LIBTORRENT_VERSION_MINOR < 16
+        if (t_status.state == libtorrent::torrent_status::finished
+                && t_status.state == libtorrent::torrent_status::seeding) {
+            t_handle.auto_managed(false);
+            t_handle.pause();
+        }
+#else
         if (t_status.is_finished && t_status.is_seeding) {
             t_handle.auto_managed(false);
             t_handle.pause(libtorrent::torrent_handle::graceful_pause);
         }
+#endif
     }
 }
 
@@ -290,7 +330,31 @@ QString TorrentClient::getDebug()
     s << "\n";
     libtorrent::session_status session_status = session->status();
     s << "Session:\n";
+    s << "Libtorrent version: " LIBTORRENT_VERSION " revision: " LIBTORRENT_REVISION "\n";
     s << "===========================\n";
+#if LIBTORRENT_VERSION_MINOR < 16
+    s << "\n";
+    s << "Payloads:\n";
+    s << "===========================\n";
+    std::vector<libtorrent::torrent_handle> ts =  session->get_torrents();
+    std::vector<libtorrent::torrent_handle>::iterator ti;
+    for (ti = ts.begin(); ti < ts.end(); ti++) {
+        libtorrent::torrent_handle t_handle = (*ti);
+        libtorrent::torrent_status t_status = t_handle.status();
+        libtorrent::torrent_info t_info = t_handle.get_torrent_info();
+
+        s << t_info.name().c_str() << "\n";
+        s << "---------------------------\n";
+        s << "Size:" << t_info.total_size() << "\n";
+        s << "State:" << t_status.state << "\n";
+        s << "DL rate:" << t_status.download_rate << "\n";
+        s << "UL rate:" << t_status.upload_rate << "\n";
+        s << "Seeds:" << t_status.num_seeds << "\n";
+        s << "Peers:" << t_status.num_peers << "\n";
+        s << "Progress:" << t_status.progress << "\n";
+        s << "Error:" << t_status.error.c_str() << "\n";
+    }
+#else
     s << "uTP Connections: " << session_status.utp_stats.num_connected << "\n";
     s << "DWQ: " << session_status.disk_write_queue << "\n";
     s << "RWQ: " << session_status.disk_read_queue << "\n";
@@ -315,6 +379,6 @@ QString TorrentClient::getDebug()
         s << "Progress:" << t_status.progress << "\n";
         s << "Error:" << t_status.error.c_str() << "\n";
     }
-
+#endif
     return ret;
 }

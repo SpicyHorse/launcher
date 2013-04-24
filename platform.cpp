@@ -12,6 +12,10 @@
 #ifdef Q_WS_MAC
 #include <sys/resource.h>
 #define min(a,b) (((a) < (b)) ? (a) : (b))
+#elif defined Q_WS_X11
+#include <sys/resource.h>
+#include <stdio.h>
+#define min(a,b) (((a) < (b)) ? (a) : (b))
 #elif defined Q_WS_WIN
 #include <stdio.h>
 #endif
@@ -74,6 +78,17 @@ void platformInitialize()
 
     rlimit rlp;
     getrlimit(RLIMIT_NOFILE, &rlp);
+    qDebug() << "Platform initialization: open files limit" << rlp.rlim_cur << "rising to max" << min(OPEN_MAX, rlp.rlim_max);
+    rlp.rlim_cur = min(OPEN_MAX, rlp.rlim_max);
+    setrlimit(RLIMIT_NOFILE, &rlp);
+#elif defined Q_WS_X11
+    *game_config_dir()          = "/usr/share/spicyhorse/" + executable_file_info.baseName() + "/game_config/";
+    *game_config_file()         = "/usr/share/spicyhorse/" + executable_file_info.baseName() + "/game_config/game.cfg";
+    *platform_id()              = "lin";
+
+    rlimit rlp;
+    getrlimit(RLIMIT_NOFILE, &rlp);
+    long int OPEN_MAX = sysconf(_SC_OPEN_MAX);
     qDebug() << "Platform initialization: open files limit" << rlp.rlim_cur << "rising to max" << min(OPEN_MAX, rlp.rlim_max);
     rlp.rlim_cur = min(OPEN_MAX, rlp.rlim_max);
     setrlimit(RLIMIT_NOFILE, &rlp);
