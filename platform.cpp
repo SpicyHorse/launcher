@@ -86,12 +86,13 @@ void platformInitialize()
     *game_config_file()         = "/usr/share/spicyhorse/" + executable_file_info.baseName() + "/game_config/game.cfg";
     *platform_id()              = "lin";
 
-    rlimit rlp;
-    getrlimit(RLIMIT_NOFILE, &rlp);
-    long int OPEN_MAX = sysconf(_SC_OPEN_MAX);
-    qDebug() << "Platform initialization: open files limit" << rlp.rlim_cur << "rising to max" << min(OPEN_MAX, rlp.rlim_max);
-    rlp.rlim_cur = min(OPEN_MAX, rlp.rlim_max);
-    setrlimit(RLIMIT_NOFILE, &rlp);
+    // TODO: check if it is good idea to do that with user privileges.
+    // brlimit rlp;
+    // getrlimit(RLIMIT_NOFILE, &rlp);
+    // long int OPEN_MAX = sysconf(_SC_OPEN_MAX);
+    // qDebug() << "Platform initialization: open files limit" << rlp.rlim_cur << "rising to max" << min(OPEN_MAX, rlp.rlim_max);
+    // rlp.rlim_cur = min(OPEN_MAX, rlp.rlim_max);
+    // setrlimit(RLIMIT_NOFILE, &rlp);
 #elif defined Q_WS_WIN
     QDir dir(QCoreApplication::applicationDirPath());
     dir.cd("plugins");
