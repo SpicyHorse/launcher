@@ -92,8 +92,19 @@ void TorrentClient::applySettings()
     settings.stop_tracker_timeout = 1;
     settings.file_pool_size = 32;
 #if LIBTORRENT_VERSION_MINOR < 16
-    // TODO
-    settings.active_limit = s.value("bt/connections_limit_value", 32).toInt();
+    if (s.value("bt/upload_limit_enabled", false).toBool()) {
+        session->set_upload_rate_limit(s.value("bt/upload_limit_value", 128).toInt() * 1024);
+    } else {
+        session->set_upload_rate_limit(0);
+    }
+
+    if (s.value("bt/download_limit_enabled", false).toBool()) {
+        session->set_download_rate_limit(s.value("bt/download_limit_value", 128).toInt() * 1024);
+    } else {
+        session->set_download_rate_limit(0);
+    }
+
+    session->set_max_connections(s.value("bt/connections_limit_value", 32).toInt());
 #else
     settings.always_send_user_agent = true;
     settings.enable_incoming_utp = s.value("bt/utp_enabled", true).toBool();
@@ -177,7 +188,14 @@ void TorrentClient::timerLog()
 {
 
 #if LIBTORRENT_VERSION_MINOR < 16
-    // TODO
+    while (true) {
+        std::auto_ptr<libtorrent::alert> ap = session->pop_alert();
+        libtorrent::alert *a = ap.get();
+        if (!a)
+            break;
+
+        qDebug() << "TorrentClient::timerLog():" << a->message().c_str();
+    }
 #else
     std::deque<libtorrent::alert*> alerts;
     session->pop_alerts(&alerts);
