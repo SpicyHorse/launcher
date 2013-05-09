@@ -3,7 +3,6 @@
 
 #include <QProgressDialog>
 #include <QDesktopWidget>
-#include <QSharedMemory>
 #include <QMessageBox>
 #include <QCloseEvent>
 #include <QSettings>
@@ -21,20 +20,11 @@
 
 MainWindow::MainWindow(QApplication *app, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::MainWindow), sd(new SettingsDialog(this)), shm(new QSharedMemory("SpicyhorseLauncher", this)),
+    ui(new Ui::MainWindow), sd(new SettingsDialog(this)),
     diffX(0), diffY(0), diffA(false),
     app_settings(0), game_settings(0),
     gp(0), us(0), tc(0)
 {
-    if (!shm->create(1)) {
-#ifdef Q_WS_MAC
-        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running. If it is not please restart your mac.");
-#else
-        QMessageBox::critical(this, "Launcher is already running", "Launcher is already running.");
-#endif
-        exit(EXIT_FAILURE);
-    }
-
     setWindowFlags(Qt::FramelessWindowHint);
     setStyleSheet("MainWindow {background:transparent;}");
     setAttribute(Qt::WA_TranslucentBackground);
@@ -83,12 +73,7 @@ MainWindow::MainWindow(QApplication *app, QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    if (shm->isAttached()) {
-        shm->detach();
-    }
-
     app_settings->sync();
-
     delete ui;
 }
 

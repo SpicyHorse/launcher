@@ -8,6 +8,8 @@ QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+include("qtsingleapplication/src/qtsingleapplication.pri")
+
 TARGET = launcher
 TEMPLATE = app
 

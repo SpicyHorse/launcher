@@ -8,7 +8,6 @@ namespace Ui {
     class MainWindow;
 }
 
-class QSharedMemory;
 class QSettings;
 class UpdateServer;
 class TorrentClient;
@@ -53,7 +52,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
     SettingsDialog *sd;
-    QSharedMemory *shm;
     int diffX;
     int diffY;
     bool diffA;
