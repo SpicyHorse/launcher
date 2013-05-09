@@ -9,8 +9,8 @@
 
 int main(int argc, char *argv[])
 {
-    platformInitialize();
     QtSingleApplication a(argc, argv);
+    platformInitialize();
 
     if (a.isRunning()) {
         QMessageBox::critical(0, "Launcher is already running", "Launcher is already running.");
