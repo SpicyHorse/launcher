@@ -50,7 +50,7 @@ macx {
     ICON = launcher.icns
 }
 
-linux-g++ {
+linux-g++* {
     CONFIG += link_pkgconfig
     PKGCONFIG += libtorrent-rasterbar
     LIBS += -lboost_system
